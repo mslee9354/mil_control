@@ -4,7 +4,7 @@ import os
 sys.path.append(os.path.dirname(__file__))
 import json
 import tkinter as tk
-from tkinter import messagebox
+from tkinter import messagebox, font
 
 import numpy as np
 import tensorflow as tf
@@ -32,34 +32,45 @@ class GuardApp:
     def __init__(self, master):
         self.master = master
         master.title('출입 통제')
+        master.geometry('320x260')
+        master.resizable(False, False)
 
-        self.id_label = tk.Label(master, text='군번')
-        self.id_entry = tk.Entry(master)
+        header_font = font.Font(master, size=14, weight='bold')
+        label_font = font.Font(master, size=11)
+
+        header = tk.Label(master, text='출입 통제 시스템', font=header_font)
+        header.grid(row=0, column=0, columnspan=2, pady=(0, 10))
+
+        self.id_label = tk.Label(master, text='군번', font=label_font)
+        self.id_entry = tk.Entry(master, width=15, font=label_font)
 
         self.purpose_var = tk.StringVar(master)
         self.purpose_var.set(PURPOSES[0])
         self.purpose_menu = tk.OptionMenu(master, self.purpose_var, *PURPOSES)
+        self.purpose_menu.config(width=10, font=label_font)
 
         self.dest_var = tk.StringVar(master)
         self.dest_var.set(DESTINATIONS[0])
         self.dest_menu = tk.OptionMenu(master, self.dest_var, *DESTINATIONS)
+        self.dest_menu.config(width=10, font=label_font)
 
         self.time_var = tk.StringVar(master)
         self.time_var.set(TIMES[0])
         self.time_menu = tk.OptionMenu(master, self.time_var, *TIMES)
+        self.time_menu.config(width=10, font=label_font)
 
-        self.submit_button = tk.Button(master, text='확인', command=self.process)
-        self.recent_button = tk.Button(master, text='최근 기록', command=self.show_recent)
-        self.stats_button = tk.Button(master, text='통계', command=self.show_stats)
+        self.submit_button = tk.Button(master, text='확인', command=self.process, font=label_font, width=14)
+        self.recent_button = tk.Button(master, text='최근 기록', command=self.show_recent, font=label_font)
+        self.stats_button = tk.Button(master, text='통계', command=self.show_stats, font=label_font)
 
-        self.id_label.grid(row=0, column=0)
-        self.id_entry.grid(row=0, column=1)
-        self.purpose_menu.grid(row=1, column=0, columnspan=2)
-        self.dest_menu.grid(row=2, column=0, columnspan=2)
-        self.time_menu.grid(row=3, column=0, columnspan=2)
-        self.submit_button.grid(row=4, column=0, columnspan=2)
-        self.recent_button.grid(row=5, column=0)
-        self.stats_button.grid(row=5, column=1)
+        self.id_label.grid(row=1, column=0, sticky='e', padx=5)
+        self.id_entry.grid(row=1, column=1, sticky='w', pady=2)
+        self.purpose_menu.grid(row=2, column=0, columnspan=2, pady=2)
+        self.dest_menu.grid(row=3, column=0, columnspan=2, pady=2)
+        self.time_menu.grid(row=4, column=0, columnspan=2, pady=2)
+        self.submit_button.grid(row=5, column=0, columnspan=2, pady=5)
+        self.recent_button.grid(row=6, column=0, pady=2)
+        self.stats_button.grid(row=6, column=1, pady=2)
 
         self.autoencoder = load_model_b64(AUTOENCODER_PATH)
         self.encoder = load_model_b64(ENCODER_PATH)
