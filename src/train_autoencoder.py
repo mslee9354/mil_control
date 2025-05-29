@@ -20,16 +20,18 @@ from utils import (
 
 def build_model():
     inp = layers.Input(shape=(INPUT_SIZE,))
-    x = layers.Dense(12, activation='relu')(inp)
+    x = layers.Dense(16, activation='relu')(inp)
+    x = layers.Dense(14, activation='relu')(x)
+    x = layers.Dense(12, activation='relu')(x)
     x = layers.Dense(10, activation='relu')(x)
     x = layers.Dense(8, activation='relu')(x)
-    x = layers.Dense(6, activation='relu')(x)
     encoded = layers.Dense(LATENT_SIZE, activation='relu')(x)
 
-    x = layers.Dense(6, activation='relu')(encoded)
-    x = layers.Dense(8, activation='relu')(x)
+    x = layers.Dense(8, activation='relu')(encoded)
     x = layers.Dense(10, activation='relu')(x)
     x = layers.Dense(12, activation='relu')(x)
+    x = layers.Dense(14, activation='relu')(x)
+    x = layers.Dense(16, activation='relu')(x)
     out = layers.Dense(INPUT_SIZE, activation='sigmoid')(x)
 
     autoencoder = models.Model(inp, out)

@@ -1,4 +1,4 @@
 @echo off
 python -m pip install --upgrade pip
-pip install tensorflow
+pip install tensorflow numpy
 

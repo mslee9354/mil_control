@@ -30,3 +30,5 @@ python src/guard_access_gui.py
 ```
 
 The program loads the saved models and keeps user state in `model/state.json`.
+Access logs are stored in `model/log.json`. Use the "최근 기록" and "통계"
+buttons in the GUI to view recent entries and summary statistics.

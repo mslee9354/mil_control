@@ -25,6 +25,7 @@ AUTOENCODER_PATH = os.path.join(MODEL_DIR, 'autoencoder.b64')
 ENCODER_PATH = os.path.join(MODEL_DIR, 'encoder.b64')
 THRESHOLD_PATH = os.path.join(MODEL_DIR, 'threshold.json')
 STATE_PATH = os.path.join(MODEL_DIR, 'state.json')
+LOG_PATH = os.path.join(MODEL_DIR, 'log.json')
 
 
 class GuardApp:
@@ -48,6 +49,8 @@ class GuardApp:
         self.time_menu = tk.OptionMenu(master, self.time_var, *TIMES)
 
         self.submit_button = tk.Button(master, text='확인', command=self.process)
+        self.recent_button = tk.Button(master, text='최근 기록', command=self.show_recent)
+        self.stats_button = tk.Button(master, text='통계', command=self.show_stats)
 
         self.id_label.grid(row=0, column=0)
         self.id_entry.grid(row=0, column=1)
@@ -55,6 +58,8 @@ class GuardApp:
         self.dest_menu.grid(row=2, column=0, columnspan=2)
         self.time_menu.grid(row=3, column=0, columnspan=2)
         self.submit_button.grid(row=4, column=0, columnspan=2)
+        self.recent_button.grid(row=5, column=0)
+        self.stats_button.grid(row=5, column=1)
 
         self.autoencoder = load_model_b64(AUTOENCODER_PATH)
         self.encoder = load_model_b64(ENCODER_PATH)
@@ -66,6 +71,12 @@ class GuardApp:
                 self.state = json.load(f)
         else:
             self.state = {}
+
+        if os.path.exists(LOG_PATH):
+            with open(LOG_PATH, 'r', encoding='utf-8') as f:
+                self.logs = json.load(f)
+        else:
+            self.logs = []
 
     def process(self):
         sid = self.id_entry.get().strip()
@@ -89,6 +100,36 @@ class GuardApp:
         self.state[sid] = new_prev.tolist()
         with open(STATE_PATH, 'w', encoding='utf-8') as f:
             json.dump(self.state, f, ensure_ascii=False, indent=2)
+
+        entry = {
+            'id': sid,
+            'purpose': self.purpose_var.get(),
+            'dest': self.dest_var.get(),
+            'time': self.time_var.get(),
+            'error': error,
+            'result': result,
+        }
+        self.logs.append(entry)
+        with open(LOG_PATH, 'w', encoding='utf-8') as f:
+            json.dump(self.logs, f, ensure_ascii=False, indent=2)
+
+    def show_recent(self):
+        sid = self.id_entry.get().strip()
+        if not sid:
+            messagebox.showerror('오류', '군번을 입력하세요.')
+            return
+        recent = [log for log in reversed(self.logs) if log['id'] == sid][:5]
+        if not recent:
+            messagebox.showinfo('최근 기록', '출입 기록이 없습니다.')
+            return
+        lines = [f"{l['purpose']} {l['dest']} {l['time']} 결과:{l['result']}" for l in recent]
+        messagebox.showinfo('최근 기록', '\n'.join(lines))
+
+    def show_stats(self):
+        total = len(self.logs)
+        normal = sum(1 for l in self.logs if l['result'] == '정상')
+        abnormal = total - normal
+        messagebox.showinfo('통계', f'총 기록: {total}\n정상: {normal}\n이상: {abnormal}')
 
 
 if __name__ == '__main__':
