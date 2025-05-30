@@ -5,7 +5,7 @@ check for anomalous access attempts.
 
 ## Setup (Windows)
 
-Run `install.bat` to install TensorFlow and required packages.
+Run `install.bat` to install TensorFlow, PyQt5 and other required packages.
 
 ## Training
 
@@ -23,10 +23,16 @@ This creates a `model/` folder containing:
 
 ## Running the GUI
 
-Start the guard program:
+Start the Tkinter-based guard program:
 
 ```bash
 python src/guard_access_gui.py
+```
+
+Alternatively launch the Qt-based interface:
+
+```bash
+python src/guard_access_qt.py
 ```
 
 The program loads the saved models and keeps user state in `model/state.json`.
